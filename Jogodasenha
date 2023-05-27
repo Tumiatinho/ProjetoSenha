@@ -1,0 +1,87 @@
+import random
+import os
+
+def generate_secret_key():
+    # ESSA FUNÇÃO DIZ AS DIRETRIZES PARA A SENHA DIGITADA PELO JOGADOR 1
+    secret_key = []
+    while len(secret_key) < 4:
+        new_digit = random.randint(0, 9)
+        if new_digit not in secret_key:
+            secret_key.append(new_digit)
+    return secret_key
+
+def get_guess():
+    # ESSA FUNÇÃO OBTÉM A TENTATIVA DE ACERTAR DO JOGADOR 2
+    guess = []
+    print("Digite os dígitos da senha, um de cada vez:")
+    while len(guess) < 4:
+        try:
+            digit = int(input(f"Digite o dígito {len(guess)+1}: "))
+            if digit < 0 or digit > 9:
+                raise ValueError
+            if digit in guess:
+                raise ValueError
+            guess.append(digit)
+        except ValueError:
+            print("Dígito inválido. Digite novamente.")
+    return guess
+
+def evaluate_guess(secret_key, guess):
+    # ESSA FUNÇÃO AVALIA SE A TENTATIVA DO JOGADOR 2 CONDIZ COM A SENHA DIGITADA PELO JOGADOR 1
+    right_place = 0
+    wrong_place = 0
+    for i in range(4):
+        if guess[i] == secret_key[i]:
+            right_place += 1
+        elif guess[i] in secret_key:
+            wrong_place += 1
+    return right_place, wrong_place
+
+# ESSA FUNÇÃO OBTÉM A SENHA DO JOGADOR 1
+os.system("clear")
+print("Jogador 1, digite a senha:")
+secret_key = []
+while len(secret_key) < 4:
+    try:
+        digit = int(input(f"Digite o dígito {len(secret_key)+1}: "))
+        if digit < 0 or digit > 9:
+            raise ValueError
+        if digit in secret_key:
+            raise ValueError
+        secret_key.append(digit)
+    except ValueError:
+            print("Dígito inválido. Digite novamente.")
+
+# LIMPA A TELA PARA INICIAR O JOGO E IMPEDIR O JOGADOR 2 DE SABER A SENHA DIGITADA PELO JOGADOR 1
+os.system("clear")
+
+# AQUI AS VARIÁVEIS SE INICIAM
+num_attempts = 0
+guesses = []
+
+# PRINCIPAL LOOP DO JOGO
+while True:
+    # APLICA A VARIÁVEL CRIADA ANTERIORMENTE PARA A OBTENÇÃO DA SENHA DO JOGADOR 2
+    num_attempts += 1
+    print(f"\n\n\nJogador 2, faça sua {num_attempts} Tentativa:")
+    guess = get_guess()
+
+    # UTILIZA A FUNÇÃO CRIADA ANTERIORMENTE PARA VERIFICAR SE A SENHA DIGITADA PELO JOGADOR 2 CONDIZ COM A SENHA        DO JOGADOR 1
+    right_place, wrong_place = evaluate_guess(secret_key, guess)
+    guesses.append((guess, right_place, wrong_place, num_attempts))
+
+    # MOSTRA AS INFORMAÇÕES COMO NÚMEROS CERTOS NO LUGAR CERTO E NÚMEROS CERTOS NO LUGAR ERRADO PARA O JOGADOR 2
+    os.system("clear")
+    print(f"Tentativa  {num_attempts}:\n\n")
+    
+    print(f"Numeros corretos no lugar certo: {right_place}")
+    print(f"Numeros corretos no lugar errado: {wrong_place}\n\n\n")
+    print("Senhas tentadas pelo jogador 2: ")
+    for g in guesses:
+        print(f"Tentativa {g[3]}:", g[0], f"NCLC: {g[1]}, NCLE: {g[2]}")
+
+    # VERIFICA SE O JOGADOR 2 ACERTOU A SENHA E CASO TENHA SIDO O CASO, O JOGO TERMINA
+    if right_place == 4:
+        print("Parabéns jogador 2, você acertou a senha!")
+        print(f"Numero de tentativas: {num_attempts}")
+        break
